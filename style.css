@@ -1,0 +1,370 @@
+:root {
+    --bg-dark: #141312;
+    --surface-dark: #1f1d1b;
+    --paper-cream: #f6f1e7;
+    --ink-dark: #231f1d;
+    --ink-muted: #5c544e;
+    --gold-accent: #c8a97e;
+    --text-light: #ece6de;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Efek tekstur film grain halus */
+.grain-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: url("https://www.transparenttextures.com/patterns/stardust.png");
+    z-index: 999;
+}
+
+/* Header & Navigasi */
+.top-header {
+    text-align: center;
+    padding: 55px 20px 30px;
+}
+
+.eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 3px;
+    color: var(--gold-accent);
+    margin-bottom: 10px;
+}
+
+.top-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.5rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    margin-bottom: 28px;
+}
+
+.tab-nav {
+    display: inline-flex;
+    background: var(--surface-dark);
+    padding: 5px;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: #9e968e;
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+    background: var(--gold-accent);
+    color: #141312;
+    font-weight: 500;
+}
+
+/* Wrapper & Tab Logic */
+.main-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 20px 80px;
+}
+
+.tab-content {
+    display: none;
+    animation: slideUp 0.45s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Kertas Surat (Notes) */
+.paper-sheet {
+    background-color: var(--paper-cream);
+    color: var(--ink-dark);
+    max-width: 640px;
+    margin: 10px auto;
+    padding: 48px 44px;
+    border-radius: 4px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+    position: relative;
+    background-image: repeating-linear-gradient(
+        transparent,
+        transparent 31px,
+        rgba(140, 120, 100, 0.12) 32px
+    );
+}
+
+.paper-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(35, 31, 29, 0.15);
+}
+
+.stamp {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    border: 1px solid var(--ink-dark);
+    padding: 4px 10px;
+    font-weight: 500;
+}
+
+.paper-date {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--ink-muted);
+}
+
+.paper-body p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem;
+    line-height: 32px;
+    margin-bottom: 24px;
+}
+
+.paper-footer {
+    margin-top: 36px;
+    text-align: right;
+}
+
+.handwriting {
+    font-family: 'Caveat', cursive;
+    font-size: 1.5rem;
+    color: var(--ink-muted);
+}
+
+.sign-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin-top: 4px;
+}
+
+/* Galeri Polaroid */
+/* Galeri Polaroid - Grid 16 Foto */
+.instruction {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #8f877f;
+    margin-bottom: 32px;
+}
+
+.polaroid-board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    padding: 10px 0;
+}
+
+.polaroid-item {
+    background: #fdfbf7;
+    padding: 11px 11px 20px 11px;
+    border-radius: 3px;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.45);
+    cursor: pointer;
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease;
+    color: var(--ink-dark);
+}
+
+/* Sudut kemiringan bervariasi biar natural */
+.polaroid-item:nth-child(4n+1) { transform: rotate(-1.8deg); }
+.polaroid-item:nth-child(4n+2) { transform: rotate(1.4deg); }
+.polaroid-item:nth-child(4n+3) { transform: rotate(-1.2deg); }
+.polaroid-item:nth-child(4n+4) { transform: rotate(1.9deg); }
+
+.polaroid-item:hover {
+    transform: rotate(0deg) scale(1.06);
+    box-shadow: 0 22px 45px rgba(0,0,0,0.75);
+    z-index: 10;
+}
+
+.polaroid-item img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    filter: contrast(1.03) sepia(0.08);
+    display: block;
+    margin-bottom: 12px;
+}
+
+.polaroid-caption {
+    font-family: 'Caveat', cursive;
+    font-size: 1.25rem;
+    text-align: center;
+    color: #2c2724;
+    line-height: 1.2;
+}
+
+.polaroid-meta {
+    display: block;
+    text-align: center;
+    font-size: 0.68rem;
+    color: #8a8179;
+    margin-top: 4px;
+}
+
+/* Responsif Tablet & HP */
+@media (max-width: 820px) {
+    .polaroid-board {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+    }
+}
+
+/* Modal Diary Book */
+.overlay-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 9, 8, 0.85);
+    backdrop-filter: blur(6px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.overlay-modal.active {
+    display: flex;
+}
+
+.diary-book {
+    background: var(--paper-cream);
+    color: var(--ink-dark);
+    max-width: 760px;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.8);
+    animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+    from { opacity: 0; transform: scale(0.94); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.close-modal {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: rgba(35, 31, 29, 0.1);
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-size: 1.3rem;
+    cursor: pointer;
+    color: var(--ink-dark);
+    z-index: 10;
+}
+
+.book-left img {
+    width: 100%;
+    height: 100%;
+    min-height: 360px;
+    object-fit: cover;
+    display: block;
+}
+
+.book-right {
+    padding: 36px 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.book-loc {
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8c6d53;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.book-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem;
+    line-height: 1.2;
+}
+
+.divider {
+    width: 40px;
+    height: 2px;
+    background: var(--gold-accent);
+    margin: 16px 0;
+}
+
+.book-story {
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: #3f3a36;
+    margin-bottom: 20px;
+}
+
+/* Responsif HP */
+/* Optimasi Khusus Layar HP (WhatsApp Browser / Safari / Chrome Mobile) */
+@media (max-width: 480px) {
+    .top-header {
+        padding: 40px 16px 24px;
+    }
+
+    .top-header h1 {
+        font-size: 1.9rem;
+    }
+
+    .tab-btn {
+        padding: 9px 18px;
+        font-size: 0.8rem;
+    }
+
+    .polaroid-board {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+    }
+
+    .polaroid-item {
+        padding: 8px 8px 16px 8px;
+    }
+
+    .polaroid-caption {
+        font-size: 1.1rem;
+    }
+
+    .book-right {
+        padding: 24px 20px;
+    }
+
+    .book-title {
+        font-size: 1.45rem;
+    }
+}

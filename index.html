@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diary</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #141312;
+            --surface-dark: #1f1d1b;
+            --paper-cream: #f6f1e7;
+            --ink-dark: #231f1d;
+            --ink-muted: #5c544e;
+            --gold-accent: #c8a97e;
+            --text-light: #ece6de;
+            --env-body: #e6dccb;
+            --env-flap: #d8cbb6;
+            --env-pocket: #efe7d8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* =========================================
+           LANDING PAGE: ANIMASI AMPLOP SURAT
+           ========================================= */
+        .envelope-screen {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, #221f1c 0%, #11100f 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 500;
+            padding: 20px;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .envelope-screen.fade-out {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .env-hint {
+            font-size: 0.78rem;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--gold-accent);
+            margin-bottom: 42px;
+            animation: pulseText 2s infinite;
+            text-align: center;
+        }
+
+        @keyframes pulseText {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            background: var(--env-body);
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.75);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .envelope-wrapper:hover {
+            transform: translateY(-4px);
+        }
+
+        /* Kertas di dalam amplop */
+        .letter-preview {
+            position: absolute;
+            bottom: 10px;
+            left: 15px;
+            width: 270px;
+            height: 170px;
+            background: var(--paper-cream);
+            border-radius: 4px;
+            padding: 20px;
+            color: var(--ink-dark);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            z-index: 2;
+            transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .letter-preview h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            margin-bottom: 6px;
+        }
+
+        .letter-preview p {
+            font-family: 'Caveat', cursive;
+            font-size: 1.2rem;
+            color: var(--ink-muted);
+        }
+
+        /* Kantong depan amplop */
+        .envelope-pocket {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .envelope-pocket::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            border-left: 150px solid var(--env-pocket);
+            border-right: 150px solid var(--env-pocket);
+            border-top: 105px solid transparent;
+            border-bottom: 95px solid var(--env-pocket);
+        }
+
+        /* Tutup atas amplop */
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 115px solid var(--env-flap);
+            transform-origin: top;
+            transition: transform 0.65s ease, z-index 0.2s ease;
+            z-index: 4;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+        }
+
+        /* Segel lilin (Wax Seal) */
+        .wax-seal {
+            position: absolute;
+            top: 88px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 48px;
+            height: 48px;
+            background: radial-gradient(circle at 30% 30%, #b84a39, #7d291d);
+            border-radius: 50%;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f6e3ba;
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 0 0 2px rgba(246, 227, 186, 0.3);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        /* State saat amplop dibuka */
+        .envelope-wrapper.open .wax-seal {
+            opacity: 0;
+            transform: translateX(-50%) scale(0.7);
+        }
+
+        .envelope-wrapper.open .envelope-flap {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        .envelope-wrapper.open .letter-preview {
+            transform: translateY(-115px);
+        }
+
+        /* =========================================
+           KONTEN UTAMA
+           ========================================= */
+        .main-content {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .main-content.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .top-header {
+            text-align: center;
+            padding: 48px 16px 28px;
+        }
+
+        .eyebrow {
+            font-size: 0.72rem;
+            letter-spacing: 3px;
+            color: var(--gold-accent);
+            margin-bottom: 10px;
+        }
+
+        .top-header h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.3rem;
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
+
+        .tab-nav {
+            display: inline-flex;
+            background: var(--surface-dark);
+            padding: 5px;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #9e968e;
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-size: 0.84rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--gold-accent);
+            color: #141312;
+            font-weight: 500;
+        }
+
+        .main-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 16px 16px 80px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: slideUp 0.45s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Kertas Surat */
+        .paper-sheet {
+            background-color: var(--paper-cream);
+            color: var(--ink-dark);
+            max-width: 640px;
+            margin: 6px auto;
+            padding: 42px 36px;
+            border-radius: 4px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            background-image: repeating-linear-gradient(
+                transparent,
+                transparent 31px,
+                rgba(140, 120, 100, 0.12) 32px
+            );
+        }
+
+        .paper-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(35, 31, 29, 0.15);
+        }
+
+        .stamp {
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            border: 1px solid var(--ink-dark);
+            padding: 4px 10px;
+            font-weight: 500;
+        }
+
+        .paper-date {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            color: var(--ink-muted);
+        }
+
+        .paper-body p {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            line-height: 32px;
+            margin-bottom: 22px;
+        }
+
+        .paper-footer {
+            margin-top: 32px;
+            text-align: right;
+        }
+
+        .handwriting {
+            font-family: 'Caveat', cursive;
+            font-size: 1.45rem;
+            color: var(--ink-muted);
+        }
+
+        .sign-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;
+            font-size: 1.15rem;
+            margin-top: 4px;
+        }
+
+        /* Galeri 16 Polaroid */
+        .instruction {
+            text-align: center;
+            font-size: 0.82rem;
+            color: #8f877f;
+            margin-bottom: 26px;
+        }
+
+        .polaroid-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 22px;
+        }
+
+        .polaroid-item {
+            background: #fdfbf7;
+            padding: 10px 10px 18px 10px;
+            border-radius: 3px;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.45);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            color: var(--ink-dark);
+        }
+
+        .polaroid-item:nth-child(4n+1) { transform: rotate(-1.6deg); }
+        .polaroid-item:nth-child(4n+2) { transform: rotate(1.3deg); }
+        .polaroid-item:nth-child(4n+3) { transform: rotate(-1.1deg); }
+        .polaroid-item:nth-child(4n+4) { transform: rotate(1.7deg); }
+
+        .polaroid-item:hover {
+            transform: rotate(0deg) scale(1.04);
+            z-index: 10;
+        }
+
+        .polaroid-item img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .polaroid-caption {
+            font-family: 'Caveat', cursive;
+            font-size: 1.2rem;
+            text-align: center;
+            color: #2c2724;
+            line-height: 1.2;
+        }
+
+        .polaroid-meta {
+            display: block;
+            text-align: center;
+            font-size: 0.66rem;
+            color: #8a8179;
+            margin-top: 4px;
+        }
+
+        /* Modal Diary */
+        .overlay-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 9, 8, 0.85);
+            backdrop-filter: blur(6px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .overlay-modal.active {
+            display: flex;
+        }
+
+        .diary-book {
+            background: var(--paper-cream);
+            color: var(--ink-dark);
+            max-width: 740px;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            position: relative;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.8);
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.94); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            background: rgba(255, 255, 255, 0.85);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: var(--ink-dark);
+            z-index: 10;
+        }
+
+        .book-left img {
+            width: 100%;
+            height: 100%;
+            min-height: 340px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .book-right {
+            padding: 32px 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .book-loc {
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #8c6d53;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .book-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.65rem;
+            line-height: 1.2;
+        }
+
+        .divider {
+            width: 40px;
+            height: 2px;
+            background: var(--gold-accent);
+            margin: 14px 0;
+        }
+
+        .book-story {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: #3f3a36;
+            margin-bottom: 18px;
+        }
+
+        /* Responsif Mobile */
+        @media (max-width: 768px) {
+            .polaroid-board {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 14px;
+            }
+            .diary-book {
+                grid-template-columns: 1fr;
+                max-height: 88vh;
+                overflow-y: auto;
+            }
+            .book-left img {
+                height: 250px;
+                min-height: auto;
+            }
+            .paper-sheet {
+                padding: 28px 20px;
+            }
+            .top-header h1 {
+                font-size: 1.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LANDING PAGE: ANIMASI BUKA AMPLOP -->
+    <div class="envelope-screen" id="envelope-screen">
+        <p class="env-hint">Ketuk amplop untuk membuka surat</p>
+        
+        <div class="envelope-wrapper" id="envelope">
+            <div class="envelope-flap"></div>
+            <div class="wax-seal">A</div>
+            
+            <div class="letter-preview">
+                <h3>To: Adell</h3>
+                <p>Our memories &amp; diary...</p>
+            </div>
+            
+            <div class="envelope-pocket"></div>
+        </div>
+    </div>
+
+    <!-- KONTEN UTAMA -->
+    <div class="main-content" id="main-content">
+        <header class="top-header">
+            <p class="eyebrow">2026 • ARCHIVE</p>
+            <h1>Our memories &amp; diary</h1>
+            
+            <!-- Navigasi Tab -->
+            <nav class="tab-nav">
+                <button class="tab-btn active" data-target="notes-tab">Catatan &amp; Surat</button>
+                <button class="tab-btn" data-target="diary-tab">Galeri Diary</button>
+            </nav>
+        </header>
+
+        <main class="main-wrapper">
+            <!-- TAB 1: NOTES / SURAT -->
+            <section id="notes-tab" class="tab-content active">
+                <div class="paper-sheet">
+                    <div class="paper-header">
+                        <span class="stamp">To: ADELL</span>
+                        <span class="paper-date"></span>
+                    </div>
+                    
+                    <div class="paper-body">
+                        <p>Hai, Dell.</p>
+
+                        <p>
+                            aku harap kamu lagi baik baik aja yaa dan aku berharap banget mental kamu juga lagi oke.
+                            and so sowrie yaa saat kemarin aku strees awal di tinggal sama kamu aku mencoba lampiasi ke roko
+                            karna jujur kamu ngebuka trauma aku yang waktu itu aku pernah bilang tiba tiba di tinggal gitu aja sama orang yang aku sayang. dan aku tau itu salah banget tapi aku cuma pengen kamu tau kalo aku bener bener sayang sama kamu.
+                        </p>
+
+                        <p>
+                            aku tau kamu lagi sibuk banget sama PKL kamu, tapi aku cuma pengen bilang kalo aku bener bener kangen sama kamu aku kangen yapping ke kamu. aku tau aku bukan orang yang sempurna, tapi aku pengen jadi orang yang bisa bikin kamu bahagia. aku pengen jadi orang yang bisa nemenin kamu di saat seneng maupun sedih. aku pengen jadi orang yang bisa bikin kamu ngerasa aman dan nyaman.
+                            dan nyatanya aku cuman bisa bikin kamu kecewa, dan aku gatau pasti kondisi kamu sekarang gimana, entah itu sedih seneng atau malah lagi bete aku cuman bisa awaasin kamu dari jauhh dan info dari temen temen aku 
+                        </p>
+
+                        <p>
+                            semenjak hubungan ini selesai aku sering banget ovt in kamu setiap malem, aneh yaa padahal udah gada hubungan tapi aku masih mikirin kondisi kamu
+                            dan semenjak gada kamu aku lebih sering diem mendem semua masalahh karna udah gada orang yang mau jadi pendengar aku
+                        </p>
+                    </div>
+
+                    <div class="paper-footer">
+                        <p class="handwriting">Terima kasih untuk semuanya,</p>
+                        <p class="sign-name">— Rehan</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: DIARY FOTO (POLAROID BOARD) -->
+            <section id="diary-tab" class="tab-content">
+                <p class="instruction">Sentuh salah satu foto Polaroid untuk membaca cerita di baliknya</p>
+                <div class="polaroid-board" id="polaroid-board">
+                    <!-- Diisi otomatis oleh JavaScript -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- POP-UP BACA DIARY -->
+    <div class="overlay-modal" id="diary-modal">
+        <div class="diary-book">
+            <button class="close-modal" id="close-modal">&times;</button>
+            <div class="book-left">
+                <img id="modal-img" src="" alt="Kenangan">
+            </div>
+            <div class="book-right">
+                <span class="book-loc" id="modal-loc"></span>
+                <h2 class="book-title" id="modal-title"></h2>
+                <div class="divider"></div>
+                <p class="book-story" id="modal-story"></p>
+                <span class="book-caption handwriting" id="modal-caption"></span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
